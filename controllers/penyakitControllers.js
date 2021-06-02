@@ -139,7 +139,7 @@ exports.calculateCF = async (req, res, next) => {
   // Add penyakitId and its gejala, cfp, cfu, cfpu(CF pakar and user)
   penyakit.map((p) => {
     cfHE[p.id] = {};
-    p.gejala.map(({ Penyakit_Gejala }, i) => {
+    p.gejala.map(({ Penyakit_Gejala }) => {
       // Init cfp and cfu
       cfHE[p.id][Penyakit_Gejala.gejalaId] = {
         cfp: Penyakit_Gejala.cfp,
@@ -161,7 +161,7 @@ exports.calculateCF = async (req, res, next) => {
 
   // CFcombine
   Object.entries(cfHE).map((cfhe) => {
-    // console.log(cfhe[1]);
+    // console.log(cfhe, 'ayee');
 
     let cfOld;
     Object.values(cfhe[1]).map((cf, i) => {
@@ -185,7 +185,21 @@ exports.calculateCF = async (req, res, next) => {
     // check comment
   });
 
-  console.log(cfHE);
+  let result = [];
+  // get rid cfcombine with 0 value
+  Object.entries(cfHE).map((cfhe) => {
+    if (cfhe[1].cfcombine > 0) {
+      result = [
+        ...result,
+        {
+          penyakitId: cfhe[0],
+          cfcombine: cfhe[1].cfcombine,
+        },
+      ];
+    }
+    // console.log(cfhe[1].cfcombine);
+  });
+  // console.log(result);
 
-  res.status(200).json(penyakit);
+  res.status(200).json(result);
 };

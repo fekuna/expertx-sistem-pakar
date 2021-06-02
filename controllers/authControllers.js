@@ -72,6 +72,7 @@ exports.signup = async (req, res, next) => {
 // LOGIN
 //
 exports.login = async (req, res, next) => {
+  console.log(req.body, "hello");
   const { username, password } = req.body;
 
   let existingUser;
@@ -117,7 +118,12 @@ exports.login = async (req, res, next) => {
 
   try {
     token = jwt.sign(
-      { userId: existingUser.id, email: existingUser.email },
+      {
+        userId: existingUser.id,
+        email: existingUser.email,
+        username: existingUser.username,
+        name: existingUser.name,
+      },
       process.env.JWT_KEY,
       { expiresIn: "1h" }
     );
@@ -129,9 +135,7 @@ exports.login = async (req, res, next) => {
     return next(error);
   }
 
-  res
-    .status(200)
-    .json({ userId: existingUser.id, username: existingUser.username, token });
+  res.status(200).json({ token });
 };
 
 //
@@ -141,7 +145,14 @@ exports.getUsers = async (req, res, next) => {
   let users;
 
   try {
-    users = await User.findAll();
+    users = await User.findAll({
+      attributes: [
+        "id",
+        "username",
+        "role",
+        // [sequelize.fn("COUNT", sequelize.col("username")), "n_users"],
+      ],
+    });
   } catch (err) {
     const error = new HttpError(
       "Fetching users failed, please try again later.",
