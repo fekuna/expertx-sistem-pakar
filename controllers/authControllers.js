@@ -15,7 +15,7 @@ exports.signup = async (req, res, next) => {
     return res.status(400).json({ errors: errors.array() });
   }
 
-  const { name, username, email, password, role } = req.body;
+  const { username, email, password, role } = req.body;
 
   console.log(req.body);
 
@@ -38,7 +38,6 @@ exports.signup = async (req, res, next) => {
     userCreated = await User.create({
       username,
       email,
-      name,
       password: hashedPassword,
       role,
     });
@@ -54,6 +53,7 @@ exports.signup = async (req, res, next) => {
       {
         userId: userCreated.id,
         email: userCreated.email,
+        username: userCreated.username,
       },
       process.env.JWT_KEY,
       { expiresIn: "1h" }
@@ -122,10 +122,9 @@ exports.login = async (req, res, next) => {
         userId: existingUser.id,
         email: existingUser.email,
         username: existingUser.username,
-        name: existingUser.name,
       },
       process.env.JWT_KEY,
-      { expiresIn: "1h" }
+      { expiresIn: "4h" }
     );
   } catch (err) {
     const error = new HttpError(

@@ -1,5 +1,10 @@
 const { options } = require("../utils/optVal");
-const { Penyakit, Penyakit_Gejala, Gejala } = require("../models");
+const {
+  Penyakit,
+  Penyakit_Gejala,
+  Gejala,
+  history_diagnosis,
+} = require("../models");
 const HttpError = require("../utils/httpError");
 
 const allPenyakit = async () => {
@@ -133,7 +138,7 @@ exports.addGejalaToPenyakit = async (req, res, next) => {
 
 exports.calculateCF = async (req, res, next) => {
   const penyakit = await allPenyakit();
-  const gejalaUser = req.body;
+  const { userId, gejala } = req.body;
   let cfHE = {};
 
   // Add penyakitId and its gejala, cfp, cfu, cfpu(CF pakar and user)
@@ -147,15 +152,16 @@ exports.calculateCF = async (req, res, next) => {
         cfpu: 0,
       };
 
-      gejalaUser.map((gu) => {
-        if (gu.gejalaId === Penyakit_Gejala.gejalaId) {
-          cfHE[p.id][Penyakit_Gejala.gejalaId] = {
-            ...cfHE[p.id][Penyakit_Gejala.gejalaId],
-            cfu: gu.cfu,
-            cfpu: parseFloat((gu.cfu * Penyakit_Gejala.cfp).toFixed(2)),
-          };
-        }
-      });
+      userId,
+        gejala.map((gu) => {
+          if (gu.gejalaId === Penyakit_Gejala.gejalaId) {
+            cfHE[p.id][Penyakit_Gejala.gejalaId] = {
+              ...cfHE[p.id][Penyakit_Gejala.gejalaId],
+              cfu: gu.cfu,
+              cfpu: parseFloat((gu.cfu * Penyakit_Gejala.cfp).toFixed(2)),
+            };
+          }
+        });
     });
   });
 
@@ -186,6 +192,9 @@ exports.calculateCF = async (req, res, next) => {
   });
 
   let result = [];
+  let maxResult = {
+    cfcombine: 0,
+  };
   // get rid cfcombine with 0 value
   Object.entries(cfHE).map((cfhe) => {
     if (cfhe[1].cfcombine > 0) {
@@ -197,9 +206,48 @@ exports.calculateCF = async (req, res, next) => {
         },
       ];
     }
-    // console.log(cfhe[1].cfcombine);
-  });
-  // console.log(result);
 
-  res.status(200).json(result);
+    // Find max result
+    if (cfhe[1].cfcombine > maxResult.cfcombine) {
+      maxResult = {
+        ...maxResult,
+        penyakitId: cfhe[0],
+        cfcombine: cfhe[1].cfcombine,
+      };
+    }
+  });
+
+  // console.log(maxResult, "max nich");
+  // console.log(result);
+  const penyakitResult = penyakit.find((p) => p.id === maxResult.penyakitId);
+  maxResult = {
+    ...maxResult,
+    name: penyakitResult.name,
+    solusi: penyakitResult.solusi,
+  };
+
+  const data = {
+    result,
+    maxResult,
+  };
+
+  // INSERT TO DATABASE
+  let historyDiagnosisCreated;
+  try {
+    historyDiagnosisCreated = await history_diagnosis.create({
+      userId,
+      penyakitId: maxResult.penyakitId,
+      hasil: maxResult.cfcombine,
+    });
+  } catch (err) {
+    console.log(err);
+    const error = new HttpError(
+      "Failed to add history_diagnosis, try again later.",
+      500
+    );
+
+    return next(error);
+  }
+
+  res.status(200).json(data);
 };
