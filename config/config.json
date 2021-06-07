@@ -1,10 +1,10 @@
 {
   "development": {
-    "username": "fekuna",
-    "password": null,
+    "username": "root",
+    "password": "asd123",
     "database": "sistem_pakar_ta",
     "host": "127.0.0.1",
-    "dialect": "postgres"
+    "dialect": "mariadb"
   },
   "test": {
     "username": "root",

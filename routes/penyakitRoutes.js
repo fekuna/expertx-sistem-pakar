@@ -12,6 +12,7 @@ router.delete("/:penyakitId", penyakitControllers.deletePenyakit);
 
 // Relation between penyakit and gejala
 router.post("/add/gejala", penyakitControllers.addGejalaToPenyakit);
+router.delete("/remove/gejala", penyakitControllers.removeGejalaToPenyakit);
 
 // Calculation
 router.post("/calculateCF", penyakitControllers.calculateCF);

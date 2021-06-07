@@ -11,7 +11,7 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      desc: {
+      question: {
         type: Sequelize.STRING,
       },
       createdAt: {

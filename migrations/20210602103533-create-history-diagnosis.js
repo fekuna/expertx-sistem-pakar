@@ -4,18 +4,20 @@ module.exports = {
     await queryInterface.createTable(
       "history_diagnosis",
       {
-        // id: {
-        //   allowNull: false,
-        //   autoIncrement: true,
-        //   primaryKey: true,
-        //   type: Sequelize.INTEGER
-        // },
+        id: {
+          allowNull: false,
+          autoIncrement: true,
+          primaryKey: true,
+          type: Sequelize.INTEGER
+        },
         penyakitId: {
           type: Sequelize.STRING,
-          references: {
-            model: "penyakit",
-            key: "id",
-          },
+          // references: {
+          //   model: "penyakit",
+          //   key: "id",
+          // },
+          // onDelete: "NO ACTION",
+          // onUpdate: "CASCADE",
           allowNull: false,
         },
         userId: {
@@ -24,6 +26,8 @@ module.exports = {
             model: "users",
             key: "id",
           },
+          onDelete: "NO ACTION",
+          onUpdate: "CASCADE",
           allowNull: false,
         },
         hasil: {

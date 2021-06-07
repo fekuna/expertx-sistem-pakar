@@ -7,16 +7,24 @@ module.exports = (sequelize, DataTypes) => {
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
-    static associate({history_diagnosis, Penyakit}) {
+    static associate({ history_diagnosis, Penyakit }) {
       // define association here
 
-      User.belongsToMany(Penyakit, {
-        through: "history_diagnosis",
+      // User.belongsToMany(Penyakit, {
+      //   through: "history_diagnosis",
+      //   foreignKey: "userId",
+      //   as: "users",
+      //   uniqueKey: "userId",
+      //   // onDelete: "NO ACTION",
+      //   // onUpdate: "CASCADE",
+      //   // constraints: false,
+      // });
+      User.hasMany(history_diagnosis, {
         foreignKey: "userId",
-        as: "users",
-        uniqueKey: "userId",
+        onDelete: "NO ACTION",
+        onUpdate: "CASCADE",
+        // constraints: false,
       });
-      User.hasMany(history_diagnosis, { foreignKey: "userId" });
     }
   }
   User.init(

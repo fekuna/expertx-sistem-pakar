@@ -9,8 +9,17 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate({ Penyakit, User }) {
       // define association here
-      history_diagnosis.belongsTo(User, { foreignKey: "userId" });
-      history_diagnosis.belongsTo(Penyakit, { foreignKey: "penyakitId" });
+      history_diagnosis.belongsTo(User, {
+        foreignKey: "userId",
+        onDelete: "NO ACTION",
+        onUpdate: "CASCADE",
+      });
+      // history_diagnosis.belongsTo(Penyakit, {
+      //   foreignKey: "penyakitId",
+      //   // onDelete: "NO ACTION",
+      //   // onUpdate: "CASCADE",
+      //   constraints: false,
+      // });
     }
   }
   history_diagnosis.init(
@@ -18,10 +27,10 @@ module.exports = (sequelize, DataTypes) => {
       penyakitId: {
         type: DataTypes.INTEGER,
         allowNull: false,
-        references: {
-          model: "penyakit",
-          key: "id",
-        },
+        // references: {
+        //   model: "penyakit",
+        //   key: "id",
+        // },
       },
       userId: {
         type: DataTypes.INTEGER,

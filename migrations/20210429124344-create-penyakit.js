@@ -13,8 +13,11 @@ module.exports = {
           type: Sequelize.STRING,
           allowNull: false,
         },
+        penjelasan: {
+          type: Sequelize.TEXT,
+        },
         solusi: {
-          type: Sequelize.STRING,
+          type: Sequelize.TEXT,
         },
         createdAt: {
           allowNull: false,

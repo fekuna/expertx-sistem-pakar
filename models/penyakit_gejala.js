@@ -9,8 +9,14 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate({ Gejala, Penyakit }) {
       // define association here
-      Penyakit_Gejala.belongsTo(Gejala, { foreignKey: "gejalaId" });
-      Penyakit_Gejala.belongsTo(Penyakit, { foreignKey: "penyakitId" });
+      Penyakit_Gejala.belongsTo(Gejala, {
+        foreignKey: "gejalaId",
+        onDelete: "CASCADE",
+      });
+      Penyakit_Gejala.belongsTo(Penyakit, {
+        foreignKey: "penyakitId",
+        onDelete: "CASCADE",
+      });
     }
   }
   Penyakit_Gejala.init(

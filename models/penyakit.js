@@ -14,20 +14,31 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "penyakitId",
         as: "gejala",
         uniqueKey: "penyakitId",
+        onDelete: "CASCADE",
       });
 
-      Penyakit.hasMany(Penyakit_Gejala, { foreignKey: "penyakitId" });
-
-      Penyakit.belongsToMany(User, {
-        through: "history_diagnosis",
+      Penyakit.hasMany(Penyakit_Gejala, {
         foreignKey: "penyakitId",
-        as: "penyakit",
-        uniqueKey: "penyakitId",
+        onDelete: "NO ACTION",
+        onUpdate: "CASCADE",
       });
 
-      Penyakit.hasMany(history_diagnosis, {
-        foreignKey: "penyakitId",
-      });
+      // Penyakit.belongsToMany(User, {
+      //   through: "history_diagnosis",
+      //   foreignKey: "penyakitId",
+      //   as: "penyakit",
+      //   uniqueKey: "penyakitId",
+      //   // onDelete: "NO ACTION",
+      //   // onUpdate: "CASCADE",
+      //   // constraints: false,
+      // });
+
+      // Penyakit.hasMany(history_diagnosis, {
+      //   foreignKey: "penyakitId",
+      //   // onDelete: "NO ACTION",
+      //   // onUpdate: "CASCADE",
+      //   // constraints: false,
+      // });
     }
   }
   Penyakit.init(
@@ -36,8 +47,11 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
+      penjelasan: {
+        type: DataTypes.TEXT,
+      },
       solusi: {
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT,
       },
     },
     {

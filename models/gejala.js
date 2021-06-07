@@ -14,8 +14,12 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "gejalaId",
         as: "penyakit",
         uniqueKey: "gejalaId",
+        onDelete: "CASCADE",
       });
-      Gejala.hasMany(Penyakit_Gejala, { foreignKey: "gejalaId" });
+      Gejala.hasMany(Penyakit_Gejala, {
+        foreignKey: "gejalaId",
+        onDelete: "CASCADE",
+      });
     }
   }
   Gejala.init(
@@ -24,7 +28,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      desc: DataTypes.STRING,
+      question: DataTypes.STRING,
     },
     {
       sequelize,

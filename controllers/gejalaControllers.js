@@ -17,11 +17,11 @@ exports.getAllGejala = async (req, res, next) => {
 };
 
 exports.createGejala = async (req, res, next) => {
-  const { id, name, desc } = req.body;
+  const { id, name, question } = req.body;
 
   let gejalaCreated;
   try {
-    gejalaCreated = await Gejala.create({ id, name, desc });
+    gejalaCreated = await Gejala.create({ id, name, question });
   } catch (err) {
     const error = new HttpError(
       "Failed to add gejala into database, try again later.",
@@ -34,19 +34,19 @@ exports.createGejala = async (req, res, next) => {
   res.status(200).json({
     id: gejalaCreated.id,
     name: gejalaCreated.name,
-    desc: gejalaCreated.desc,
+    question: gejalaCreated.question,
   });
 };
 
 exports.updateGejala = async (req, res, next) => {
-  const { name, desc } = req.body;
+  const { name, question } = req.body;
   const gejalaId = req.params.gejalaId;
 
   console.log("gejalaId: " + gejalaId);
   let updatedGejala;
   try {
     updatedGejala = await Gejala.update(
-      { name, desc },
+      { name, question },
       {
         where: {
           id: gejalaId,
@@ -77,9 +77,10 @@ exports.deleteGejala = async (req, res, next) => {
     });
   } catch (err) {
     const error = new HttpError(
-      "Failed to delete gejal, try again later.",
+      "Failed to delete gejala, try again later.",
       500
     );
+    console.log(err);
     return next(error);
   }
 

@@ -63,12 +63,12 @@ exports.createPenyakit = async (req, res, next) => {
 
 exports.updatePenyakit = async (req, res, next) => {
   const penyakitId = req.params.penyakitId;
-  const { name, solusi } = req.body;
+  const { name, solusi, penjelasan } = req.body;
 
   let penyakitUpdated;
   try {
     penyakitUpdated = await Penyakit.update(
-      { name, solusi },
+      { name, solusi, penjelasan },
       {
         where: {
           id: penyakitId,
@@ -99,9 +99,10 @@ exports.deletePenyakit = async (req, res, next) => {
     });
   } catch (err) {
     const error = new HttpError(
-      "Failed to delete gejal, try again later.",
+      "Failed to delete penyakit, try again later.",
       500
     );
+    console.log(err);
     return next(error);
   }
 
@@ -134,6 +135,30 @@ exports.addGejalaToPenyakit = async (req, res, next) => {
   }
 
   res.status(200).json(penyakit);
+};
+
+exports.removeGejalaToPenyakit = async (req, res, next) => {
+  const { penyakitId, gejalaId } = req.body;
+
+  let gejalaRemovedFromPenyakit;
+  try {
+    gejalaRemovedFromPenyakit = await Penyakit_Gejala.destroy({
+      where: {
+        penyakitId,
+        gejalaId,
+      },
+    });
+
+  } catch (err) {
+    const error = new HttpError(
+      "Failed to remove gejala to penyakit, please try again later.",
+      500
+    );
+
+    next(error);
+  }
+
+  res.status(200).json(gejalaRemovedFromPenyakit);
 };
 
 exports.calculateCF = async (req, res, next) => {
