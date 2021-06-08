@@ -20,6 +20,10 @@ module.exports = {
           // onUpdate: "CASCADE",
           allowNull: false,
         },
+        penyakitName: {
+          type: Sequelize.STRING,
+          allowNull: false,
+        },
         userId: {
           type: Sequelize.INTEGER,
           references: {

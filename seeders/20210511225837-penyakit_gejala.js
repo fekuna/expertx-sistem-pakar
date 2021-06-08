@@ -268,30 +268,8 @@ module.exports = {
         updatedAt: new Date(),
       },
 
-      // P10 Helminthiasis
-      {
-        penyakitId: "P10",
-        gejalaId: "G19",
-        cfp: 1,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      {
-        penyakitId: "P10",
-        gejalaId: "G20",
-        cfp: 1,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      {
-        penyakitId: "P10",
-        gejalaId: "G11",
-        cfp: 0.6,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
       
-      // P11 Helminthiasis
+      // P11 Gingivitis
       {
         penyakitId: "P11",
         gejalaId: "G18",

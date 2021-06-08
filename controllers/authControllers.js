@@ -54,6 +54,7 @@ exports.signup = async (req, res, next) => {
         userId: userCreated.id,
         email: userCreated.email,
         username: userCreated.username,
+        role: userCreated.role,
       },
       process.env.JWT_KEY,
       { expiresIn: "1h" }
@@ -122,6 +123,7 @@ exports.login = async (req, res, next) => {
         userId: existingUser.id,
         email: existingUser.email,
         username: existingUser.username,
+        role: existingUser.role,
       },
       process.env.JWT_KEY,
       { expiresIn: "4h" }

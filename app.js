@@ -8,6 +8,7 @@ const db = require("./config/database");
 const authRoutes = require("./routes/authRoutes");
 const gejalaRoutes = require("./routes/gejalaRoutes");
 const penyakitRoutes = require("./routes/penyakitRoutes");
+const historyRoutes = require("./routes/historyRoutes");
 
 const app = express();
 
@@ -36,6 +37,7 @@ app.use((req, res, next) => {
 app.use("/api/users", authRoutes);
 app.use("/api/gejala", gejalaRoutes);
 app.use("/api/penyakit", penyakitRoutes);
+app.use("/api/history", historyRoutes);
 
 app.use((error, req, res, next) => {
   if (res.headersSent) {

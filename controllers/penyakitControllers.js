@@ -148,7 +148,6 @@ exports.removeGejalaToPenyakit = async (req, res, next) => {
         gejalaId,
       },
     });
-
   } catch (err) {
     const error = new HttpError(
       "Failed to remove gejala to penyakit, please try again later.",
@@ -261,6 +260,7 @@ exports.calculateCF = async (req, res, next) => {
   try {
     historyDiagnosisCreated = await history_diagnosis.create({
       userId,
+      penyakitName: maxResult.name,
       penyakitId: maxResult.penyakitId,
       hasil: maxResult.cfcombine,
     });
