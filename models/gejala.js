@@ -24,11 +24,16 @@ module.exports = (sequelize, DataTypes) => {
   }
   Gejala.init(
     {
+      gejalaId: {
+        allowNull: false,
+        primaryKey: true,
+        type: DataTypes.STRING(12),
+      },
       name: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(50),
         allowNull: false,
       },
-      question: DataTypes.STRING,
+      question: DataTypes.STRING(150),
     },
     {
       sequelize,

@@ -9,14 +9,14 @@ module.exports = {
         autoIncrement: true,
       },
       username: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(15),
         allowNull: false,
       },
       name: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(50),
       },
       email: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(50),
         allowNull: false,
       },
       password: {
@@ -24,7 +24,7 @@ module.exports = {
         allowNull: false,
       },
       role: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(10),
         defaultValue: "user",
         allowNull: false,
       },

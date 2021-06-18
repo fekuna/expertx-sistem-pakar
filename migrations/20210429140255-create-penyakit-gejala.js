@@ -12,23 +12,25 @@ module.exports = {
         type: Sequelize.STRING,
         references: {
           model: "penyakit",
-          key: "id",
+          key: "penyakitId",
           // onDelete: "CASCADE",
         },
         allowNull: false,
         onDelete: "CASCADE",
         onUpdate: "CASCADE",
+        primaryKey: true,
       },
       gejalaId: {
         type: Sequelize.STRING,
         references: {
           model: "gejala",
-          key: "id",
+          key: "gejalaId",
           // onDelete: "CASCADE",
         },
         allowNull: false,
         onDelete: "CASCADE",
         onUpdate: "CASCADE",
+        primaryKey: true,
       },
       cfp: {
         type: Sequelize.DOUBLE,

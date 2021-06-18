@@ -1,3 +1,4 @@
+const { validationResult } = require("express-validator");
 const { options } = require("../utils/optVal");
 const {
   Penyakit,
@@ -44,11 +45,21 @@ exports.getAllPenyakit = async (req, res, next) => {
 };
 
 exports.createPenyakit = async (req, res, next) => {
-  const { id, name, solusi } = req.body;
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  const { penyakitId, name, solusi, desc } = req.body;
 
   let penyakitCreated;
   try {
-    penyakitCreated = await Penyakit.create({ id, name, solusi });
+    penyakitCreated = await Penyakit.create({
+      penyakitId: penyakitId.toUpperCase(),
+      name,
+      solusi,
+      desc,
+    });
   } catch (err) {
     const error = new HttpError(
       "Failed to add penyakit, try again later.",
@@ -58,20 +69,27 @@ exports.createPenyakit = async (req, res, next) => {
     return next(error);
   }
 
-  res.status(200).json(penyakitCreated);
+  res
+    .status(200)
+    .json({ status: "success", msg: "Penyakit successfully created" });
 };
 
 exports.updatePenyakit = async (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
   const penyakitId = req.params.penyakitId;
-  const { name, solusi, penjelasan } = req.body;
+  const { name, solusi, desc } = req.body;
 
   let penyakitUpdated;
   try {
     penyakitUpdated = await Penyakit.update(
-      { name, solusi, penjelasan },
+      { name, solusi, desc },
       {
         where: {
-          id: penyakitId,
+          penyakitId,
         },
       }
     );
@@ -84,7 +102,7 @@ exports.updatePenyakit = async (req, res, next) => {
     return next(error);
   }
 
-  res.status(200).json(penyakitUpdated);
+  res.status(200).json({ status: "success", msg: "Data updated successfully" });
 };
 
 exports.deletePenyakit = async (req, res, next) => {
@@ -94,7 +112,7 @@ exports.deletePenyakit = async (req, res, next) => {
   try {
     penyakitDeleted = await Penyakit.destroy({
       where: {
-        id: penyakitId,
+        penyakitId,
       },
     });
   } catch (err) {
@@ -110,6 +128,11 @@ exports.deletePenyakit = async (req, res, next) => {
 };
 
 exports.addGejalaToPenyakit = async (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
   const { penyakitId, gejalaId, cfp } = req.body;
 
   let gejalaPenyakitCreated;
@@ -122,7 +145,7 @@ exports.addGejalaToPenyakit = async (req, res, next) => {
     });
 
     penyakit = await Penyakit.findOne({
-      where: { id: penyakitId },
+      where: { penyakitId },
       include: ["gejala"],
     });
   } catch (err) {
@@ -138,6 +161,11 @@ exports.addGejalaToPenyakit = async (req, res, next) => {
 };
 
 exports.removeGejalaToPenyakit = async (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
   const { penyakitId, gejalaId } = req.body;
 
   let gejalaRemovedFromPenyakit;
@@ -161,33 +189,38 @@ exports.removeGejalaToPenyakit = async (req, res, next) => {
 };
 
 exports.calculateCF = async (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
   const penyakit = await allPenyakit();
   const { userId, gejala } = req.body;
   let cfHE = {};
 
   // Add penyakitId and its gejala, cfp, cfu, cfpu(CF pakar and user)
   penyakit.map((p) => {
-    cfHE[p.id] = {};
+    cfHE[p.penyakitId] = {};
     p.gejala.map(({ Penyakit_Gejala }) => {
       // Init cfp and cfu
-      cfHE[p.id][Penyakit_Gejala.gejalaId] = {
+      cfHE[p.penyakitId][Penyakit_Gejala.gejalaId] = {
         cfp: Penyakit_Gejala.cfp,
         cfu: 0,
         cfpu: 0,
       };
 
-      userId,
-        gejala.map((gu) => {
-          if (gu.gejalaId === Penyakit_Gejala.gejalaId) {
-            cfHE[p.id][Penyakit_Gejala.gejalaId] = {
-              ...cfHE[p.id][Penyakit_Gejala.gejalaId],
-              cfu: gu.cfu,
-              cfpu: parseFloat((gu.cfu * Penyakit_Gejala.cfp).toFixed(2)),
-            };
-          }
-        });
+      gejala.map((gu) => {
+        if (gu.gejalaId === Penyakit_Gejala.gejalaId) {
+          cfHE[p.penyakitId][Penyakit_Gejala.gejalaId] = {
+            ...cfHE[p.penyakitId][Penyakit_Gejala.gejalaId],
+            cfu: gu.cfu,
+            cfpu: parseFloat((gu.cfu * Penyakit_Gejala.cfp).toFixed(2)),
+          };
+        }
+      });
     });
   });
+  console.log("add penyakit and its gejala: ", cfHE);
 
   // CFcombine
   Object.entries(cfHE).map((cfhe) => {
@@ -243,7 +276,9 @@ exports.calculateCF = async (req, res, next) => {
 
   // console.log(maxResult, "max nich");
   // console.log(result);
-  const penyakitResult = penyakit.find((p) => p.id === maxResult.penyakitId);
+  const penyakitResult = penyakit.find(
+    (p) => p.penyakitId === maxResult.penyakitId
+  );
   maxResult = {
     ...maxResult,
     name: penyakitResult.name,

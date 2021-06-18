@@ -11,14 +11,19 @@ const authController = require("../controllers/authControllers");
 // Signup route
 router.post(
   "/signup",
-  check("email").custom((email) => {
-    return User.findOne({ where: { email } }).then((user) => {
-      if (user) {
-        return Promise.reject("Email already in use");
-      }
-    });
-  }),
+  check("email")
+    .notEmpty()
+    .withMessage("Email is required")
+    .custom((email) => {
+      return User.findOne({ where: { email } }).then((user) => {
+        if (user) {
+          return Promise.reject("Email already in use");
+        }
+      });
+    }),
   check("username")
+    .notEmpty()
+    .withMessage("username is required")
     .toLowerCase()
     .custom((username) => {
       return User.findOne({ where: { username } }).then((user) => {

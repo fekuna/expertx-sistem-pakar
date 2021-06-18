@@ -22,19 +22,19 @@ module.exports = (sequelize, DataTypes) => {
   Penyakit_Gejala.init(
     {
       penyakitId: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(12),
         allowNull: false,
         references: {
           model: "Penyakit",
-          key: "id",
+          key: "penyakitId",
         },
       },
       gejalaId: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(12),
         allowNull: false,
         references: {
           model: "Gejala",
-          key: "id",
+          key: "gejalaId",
         },
       },
       cfp: DataTypes.DOUBLE,

@@ -12,6 +12,7 @@ const HttpError = require("../utils/httpError");
 exports.signup = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
+    console.log("hehe", errors.array());
     return res.status(400).json({ errors: errors.array() });
   }
 
@@ -35,6 +36,7 @@ exports.signup = async (req, res, next) => {
   // Save user
   let userCreated;
   try {
+    console.log("oakwdoakwodkwaodko");
     userCreated = await User.create({
       username,
       email,

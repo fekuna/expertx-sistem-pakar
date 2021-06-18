@@ -33,7 +33,7 @@ module.exports = (sequelize, DataTypes) => {
         // },
       },
       penyakitName: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(50),
         allowNull: false,
       },
       userId: {

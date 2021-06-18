@@ -21,7 +21,7 @@ module.exports = {
           allowNull: false,
         },
         penyakitName: {
-          type: Sequelize.STRING,
+          type: Sequelize.STRING(50),
           allowNull: false,
         },
         userId: {

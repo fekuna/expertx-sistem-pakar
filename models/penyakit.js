@@ -43,11 +43,16 @@ module.exports = (sequelize, DataTypes) => {
   }
   Penyakit.init(
     {
+      penyakitId: {
+        allowNull: false,
+        primaryKey: true,
+        type: DataTypes.STRING(12),
+      },
       name: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(50),
         allowNull: false,
       },
-      penjelasan: {
+      desc: {
         type: DataTypes.TEXT,
       },
       solusi: {

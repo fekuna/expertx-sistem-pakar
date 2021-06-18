@@ -4,16 +4,16 @@ module.exports = {
     await queryInterface.createTable(
       "penyakit",
       {
-        id: {
+        penyakitId: {
           allowNull: false,
           primaryKey: true,
-          type: Sequelize.STRING,
+          type: Sequelize.STRING(12),
         },
         name: {
-          type: Sequelize.STRING,
+          type: Sequelize.STRING(50),
           allowNull: false,
         },
-        penjelasan: {
+        desc: {
           type: Sequelize.TEXT,
         },
         solusi: {

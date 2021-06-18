@@ -1,3 +1,5 @@
+const { validationResult } = require("express-validator");
+
 const { Gejala } = require("../models");
 const HttpError = require("../utils/httpError");
 
@@ -17,11 +19,20 @@ exports.getAllGejala = async (req, res, next) => {
 };
 
 exports.createGejala = async (req, res, next) => {
-  const { id, name, question } = req.body;
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    console.log("hehe", errors.array());
+    return res.status(400).json({ errors: errors.array() });
+  }
+  const { gejalaId, name, question } = req.body;
 
   let gejalaCreated;
   try {
-    gejalaCreated = await Gejala.create({ id, name, question });
+    gejalaCreated = await Gejala.create({
+      gejalaId: gejalaId.toUpperCase(),
+      name,
+      question,
+    });
   } catch (err) {
     const error = new HttpError(
       "Failed to add gejala into database, try again later.",
@@ -32,7 +43,7 @@ exports.createGejala = async (req, res, next) => {
   }
 
   res.status(200).json({
-    id: gejalaCreated.id,
+    gejalaId: gejalaCreated.gejalaId,
     name: gejalaCreated.name,
     question: gejalaCreated.question,
   });
@@ -49,7 +60,7 @@ exports.updateGejala = async (req, res, next) => {
       { name, question },
       {
         where: {
-          id: gejalaId,
+          gejalaId,
         },
       }
     );
@@ -72,7 +83,7 @@ exports.deleteGejala = async (req, res, next) => {
   try {
     gejalaDeleted = await Gejala.destroy({
       where: {
-        id: gejalaId,
+        gejalaId,
       },
     });
   } catch (err) {
