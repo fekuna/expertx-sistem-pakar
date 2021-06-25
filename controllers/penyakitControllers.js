@@ -188,17 +188,9 @@ exports.removeGejalaToPenyakit = async (req, res, next) => {
   res.status(200).json(gejalaRemovedFromPenyakit);
 };
 
-exports.calculateCF = async (req, res, next) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
-  const penyakit = await allPenyakit();
-  const { userId, gejala } = req.body;
+const cfSekuensial = (penyakit, gejalaUser) => {
   let cfHE = {};
-
-  // Add penyakitId and its gejala, cfp, cfu, cfpu(CF pakar and user)
+  // Add penyakitId and its gejala, cfp, cfu, cfpu(CF pakar x user)
   penyakit.map((p) => {
     cfHE[p.penyakitId] = {};
     p.gejala.map(({ Penyakit_Gejala }) => {
@@ -209,7 +201,7 @@ exports.calculateCF = async (req, res, next) => {
         cfpu: 0,
       };
 
-      gejala.map((gu) => {
+      gejalaUser.map((gu) => {
         if (gu.gejalaId === Penyakit_Gejala.gejalaId) {
           cfHE[p.penyakitId][Penyakit_Gejala.gejalaId] = {
             ...cfHE[p.penyakitId][Penyakit_Gejala.gejalaId],
@@ -220,40 +212,33 @@ exports.calculateCF = async (req, res, next) => {
       });
     });
   });
-  console.log("add penyakit and its gejala: ", cfHE);
 
-  // CFcombine
+  return cfHE;
+};
+
+const cfCombine = (cfHE) => {
   Object.entries(cfHE).map((cfhe) => {
-    // console.log(cfhe, 'ayee');
-
     let cfOld;
     Object.values(cfhe[1]).map((cf, i) => {
       if (i === 0) {
-        // console.log("massookkk");
         cfOld = cf.cfpu;
         return;
       }
       cfOld = cfOld + cf.cfpu * (1 - cfOld);
-      // console.log(cf);
     });
     cfHE[cfhe[0]]["cfcombine"] = cfOld;
-
-    // let cfCombine = Object.values(cfhe[1]).reduce((cfOld, currentObj) => {
-    //   // return cfOld.cfpu + currentObj.cfpu * (1 - cfOld.cfpu)
-    //   console.log(currentObj, 'hehe');
-    // });
-    // console.log("\n");
-    // console.log(cfhe[0], cfCombine);
-    // test
-    // check comment
   });
 
+  return cfHE;
+};
+
+const findMaxResult = (cfCombined) => {
   let result = [];
   let maxResult = {
     cfcombine: 0,
   };
   // get rid cfcombine with 0 value
-  Object.entries(cfHE).map((cfhe) => {
+  Object.entries(cfCombined).map((cfhe) => {
     if (cfhe[1].cfcombine > 0) {
       result = [
         ...result,
@@ -271,33 +256,62 @@ exports.calculateCF = async (req, res, next) => {
         penyakitId: cfhe[0],
         cfcombine: cfhe[1].cfcombine,
       };
+
+      result = result.filter(
+        (rslt) => rslt.penyakitId !== maxResult.penyakitId
+      );
     }
   });
 
-  // console.log(maxResult, "max nich");
-  // console.log(result);
-  const penyakitResult = penyakit.find(
-    (p) => p.penyakitId === maxResult.penyakitId
-  );
-  maxResult = {
-    ...maxResult,
-    name: penyakitResult.name,
-    solusi: penyakitResult.solusi,
-  };
+  return { maxResult, result };
+};
 
-  const data = {
-    result,
-    maxResult,
-  };
+exports.calculateCF = async (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
 
-  // INSERT TO DATABASE
+  const penyakit = await allPenyakit();
+  const { userId, userGejala } = req.body;
+
+  const cfHE = cfSekuensial(penyakit, userGejala);
+
+  const cfCombined = cfCombine(cfHE);
+
+  const result = findMaxResult(cfCombined);
+
+  penyakit.map((p) => {
+    // Find info for max result
+    if (p.penyakitId === result.maxResult.penyakitId) {
+      result.maxResult = {
+        ...result.maxResult,
+        name: p.name,
+        solusi: p.solusi,
+      };
+    }
+
+    // Find info for another result
+    result.result.map((rslt, idx) => {
+      if (rslt.penyakitId === p.penyakitId) {
+        result.result[idx] = {
+          ...result.result[idx],
+          name: p.name,
+          solusi: p.solusi,
+        };
+      }
+    });
+  });
+
+
+  // INSERT MAX VALUE INTO DATABASE
   let historyDiagnosisCreated;
   try {
     historyDiagnosisCreated = await history_diagnosis.create({
       userId,
-      penyakitName: maxResult.name,
-      penyakitId: maxResult.penyakitId,
-      hasil: maxResult.cfcombine,
+      penyakitName: result.maxResult.name,
+      penyakitId: result.maxResult.penyakitId,
+      hasil: result.maxResult.cfcombine,
     });
   } catch (err) {
     console.log(err);
@@ -309,5 +323,5 @@ exports.calculateCF = async (req, res, next) => {
     return next(error);
   }
 
-  res.status(200).json(data);
+  res.status(200).json(result);
 };

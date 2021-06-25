@@ -100,11 +100,11 @@ router.post(
         }
       });
     }),
-  check("gejala")
+  check("userGejala")
     .notEmpty()
-    .withMessage("Gejala is required")
+    .withMessage("userGejala is required")
     .isArray()
-    .withMessage("gejala must to be array"),
+    .withMessage("userGejala must to be array"),
   penyakitControllers.calculateCF
 );
 
