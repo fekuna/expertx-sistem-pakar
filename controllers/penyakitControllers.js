@@ -287,6 +287,7 @@ exports.calculateCF = async (req, res, next) => {
       result.maxResult = {
         ...result.maxResult,
         name: p.name,
+        desc: p.desc,
         solusi: p.solusi,
       };
     }
@@ -297,12 +298,12 @@ exports.calculateCF = async (req, res, next) => {
         result.result[idx] = {
           ...result.result[idx],
           name: p.name,
+          desc: p.desc,
           solusi: p.solusi,
         };
       }
     });
   });
-
 
   // INSERT MAX VALUE INTO DATABASE
   let historyDiagnosisCreated;

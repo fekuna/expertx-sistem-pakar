@@ -41,4 +41,22 @@ router.post("/login", authController.login);
 // getUsers route
 router.get("/", authController.getUsers);
 
+router.get("/:userId", authController.getUserById)
+
+// updateUser route
+router.patch(
+  "/:userId",
+  check("name").notEmpty().withMessage("Name is required"),
+  check("email").notEmpty().withMessage("Email is required"),
+  authController.updateProfile
+);
+
+// updateUser route
+router.patch(
+  "/password/:userId",
+  check("oldPassword").notEmpty().withMessage("Name is required"),
+  check("newPassword").notEmpty().withMessage("Email is required"),
+  authController.updatePassword
+);
+
 module.exports = router;

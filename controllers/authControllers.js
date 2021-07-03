@@ -56,6 +56,7 @@ exports.signup = async (req, res, next) => {
         userId: userCreated.id,
         email: userCreated.email,
         username: userCreated.username,
+        name: userCreated.name,
         role: userCreated.role,
       },
       process.env.JWT_KEY,
@@ -75,7 +76,6 @@ exports.signup = async (req, res, next) => {
 // LOGIN
 //
 exports.login = async (req, res, next) => {
-  console.log(req.body, "hello");
   const { username, password } = req.body;
 
   let existingUser;
@@ -125,6 +125,7 @@ exports.login = async (req, res, next) => {
         userId: existingUser.id,
         email: existingUser.email,
         username: existingUser.username,
+        name: existingUser.name,
         role: existingUser.role,
       },
       process.env.JWT_KEY,
@@ -165,4 +166,140 @@ exports.getUsers = async (req, res, next) => {
   }
 
   res.status(200).json(users);
+};
+
+exports.getUserById = async (req, res, next) => {
+  const { userId } = req.params;
+  console.log(userId);
+
+  let user;
+
+  try {
+    console.log('asodkosakd');
+    user = await User.findByPk(userId, {
+      attributes: [
+        "id",
+        "username",
+        "name",
+        "email",
+        "role",
+        // [sequelize.fn("COUNT", sequelize.col("username")), "n_users"],
+      ],
+    });
+  } catch (err) {
+    const error = new HttpError(
+      "Fetching user failed, please try again later.",
+      500
+    );
+    return next(error);
+  }
+
+  res.status(200).json(user);
+};
+
+exports.updateProfile = async (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  const { name, email } = req.body;
+  const { userId } = req.params;
+
+  let userUpdated;
+  try {
+    userUpdated = await User.update(
+      { name, email },
+      {
+        where: {
+          id: userId,
+        },
+      }
+    );
+  } catch (e) {
+    const error = new HttpError(
+      "Failed to add penyakit, try again later.",
+      500
+    );
+
+    return next(error);
+  }
+
+  res.status(200).json({ status: "success", msg: "Data updated successfully" });
+};
+
+exports.updatePassword = async (req, res, next) => {
+  const { userId } = req.params;
+  const { oldPassword, newPassword } = req.body;
+
+  let existingUser;
+  try {
+    existingUser = await User.findOne({ where: { id: userId } });
+  } catch (err) {
+    const error = new HttpError(
+      "Could not change password, please try again.",
+      500
+    );
+    return next(error);
+  }
+
+  if (!existingUser) {
+    const error = new HttpError(
+      "Could not change password, please try again.",
+      500
+    );
+    return next(error);
+  }
+
+  let isValidPassword = false;
+  try {
+    isValidPassword = await bcrypt.compare(oldPassword, existingUser.password);
+  } catch (err) {
+    const error = new HttpError(
+      "Could not change password, please try again.",
+      500
+    );
+    return next(error);
+  }
+
+  if (!isValidPassword) {
+    const error = new HttpError(
+      "Old password is invalid, please try again.",
+      500
+    );
+    return next(error);
+  }
+
+  // Hash password
+  let hashedPassword;
+  try {
+    hashedPassword = await bcrypt.hash(newPassword, 12);
+  } catch (err) {
+    const error = new HttpError(
+      "Could not change password, please try again.",
+      500
+    );
+    return next(error);
+  }
+
+  let userUpdated;
+  try {
+    userUpdated = await User.update(
+      { password: hashedPassword },
+      {
+        where: {
+          id: userId,
+        },
+      }
+    );
+  } catch (e) {
+    const error = new HttpError(
+      "Failed to add penyakit, try again later.",
+      500
+    );
+
+    return next(error);
+  }
+
+  res.status(200).json({ status: "success", msg: "Data updated successfully" });
 };
