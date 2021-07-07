@@ -661,6 +661,29 @@ module.exports = {
         createdAt: new Date(),
         updatedAt: new Date(),
       },
+
+      // P12 Myiasis
+      {
+        penyakitId: "P14",
+        gejalaId: "G33",
+        cfp: 1,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        penyakitId: "P14",
+        gejalaId: "G6",
+        cfp: 0.6,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        penyakitId: "P14",
+        gejalaId: "G15",
+        cfp: 0.6,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
     ]);
   },
 

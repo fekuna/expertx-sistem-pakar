@@ -400,6 +400,13 @@ module.exports = {
         createdAt: new Date(),
         updatedAt: new Date(),
       },
+      {
+        gejalaId: "G33",
+        name: "Belatung di sekitar ekor dan anus",
+        question: "Apakah ada belatung di sekitar ekor dan anus?",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
     ]);
   },
 

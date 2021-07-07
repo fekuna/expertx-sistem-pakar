@@ -223,6 +223,15 @@ module.exports = {
         createdAt: new Date(),
         updatedAt: new Date(),
       },
+      {
+        penyakitId: "P14",
+        name: "Myiasis ",
+        desc: "Myasis adalah penyakit yangdisebabkan oleh infestasi larva lalat suatu jaringan hidup hewan.",
+        solusi:
+          "Harus ke dokter karena memerlukan anastesia.",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
     ]);
   },
 
