@@ -50,21 +50,25 @@ exports.createGejala = async (req, res, next) => {
 };
 
 exports.updateGejala = async (req, res, next) => {
-  const { name, question } = req.body;
-  const gejalaId = req.params.gejalaId;
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    console.log("hehe", errors.array());
+    return res.status(400).json({ errors: errors.array() });
+  }
 
-  console.log("gejalaId: " + gejalaId);
+  const { name, question } = req.body;
+  const { gejalaId } = req.params;
+
   let updatedGejala;
   try {
     updatedGejala = await Gejala.update(
       { name, question },
       {
         where: {
-          gejalaId,
+          gejalaId: gejalaId,
         },
       }
     );
-    console.log(updatedGejala);
   } catch (err) {
     const error = new HttpError(
       "Failed to update gejala, try agin later.",
