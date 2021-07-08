@@ -52,7 +52,6 @@ exports.createGejala = async (req, res, next) => {
 exports.updateGejala = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    console.log("hehe", errors.array());
     return res.status(400).json({ errors: errors.array() });
   }
 
@@ -77,7 +76,7 @@ exports.updateGejala = async (req, res, next) => {
     return next(error);
   }
 
-  res.status(200).json(updatedGejala);
+  res.status(200).json({ status: "success", msg: "Data updated successfully" });
 };
 
 exports.deleteGejala = async (req, res, next) => {
